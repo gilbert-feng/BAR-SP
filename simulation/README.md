@@ -16,6 +16,6 @@ The file `sim_mse_p.R` includes the codes to produce the numerical results under
 
 The file `sim_mse_spars.R` includes the codes to produce the numerical results under different model sparsity.
 
-# Similarly, we have sim_mse_G files include the codes to produce the numerical results related to the four-group setting.
+Similarly, we have sim_mse_G files include the codes to produce the numerical results related to the four-group setting.
 
 
