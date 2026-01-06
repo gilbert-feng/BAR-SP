@@ -1,0 +1,26 @@
+{
+    "id": "A27CF481",
+    "path": "//UFS/Users$/zhangfeng/project 1 - BAR/upload/simulation/sim_mse_G_p.R",
+    "project_path": "sim_mse_G_p.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1766715327358.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "26,9",
+        "scrollLine": "8"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1766715460,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1766715460720,
+    "read_only": false,
+    "read_only_alternatives": []
+}
