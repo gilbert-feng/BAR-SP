@@ -185,6 +185,47 @@ temp_name <- t(temp_name)
 rownames(temp_name) <- select_ind
 write.csv(temp_name, paste0(prefix, "group effect.csv"), row.names = T)
 
+
+# coef sig + alpha
+show_num <- 5
+beta_thres <- 0
+pos_alpha_ind <- order(alpha_hat, decreasing = TRUE)[1:show_num]
+neg_alpha_ind <- order(alpha_hat, decreasing = FALSE)[1:show_num]
+# pos_coef_ind <- order(BAR.SP.est$beta, decreasing = TRUE)[1:show_num]
+# neg_coef_ind <- order(BAR.SP.est$beta, decreasing = FALSE)[1:show_num]
+pos_coef_ind <- which(BAR.SP.est$beta>beta_thres)
+neg_coef_ind <- which(BAR.SP.est$beta< -beta_thres)
+
+
+## high network effect terms
+agg_var_names <- colSums(X[pos_alpha_ind,])
+agg_ind <- which(agg_var_names>0)
+write.csv(colnames(X)[agg_ind], paste0(prefix, "high network effect terms.csv"), row.names = T)
+
+## high network effect and high coef terms 
+agg_inter_ind <- intersect(agg_ind,pos_coef_ind)
+write.csv(colnames(X)[agg_inter_ind], paste0(prefix, "high network effect and high coef terms.csv"), row.names = T)
+
+## high network effect and low coef terms 
+agg_inter_ind <- intersect(agg_ind,neg_coef_ind)
+write.csv(colnames(X)[agg_inter_ind], paste0(prefix, "high network effect and low coef terms.csv"), row.names = T)
+
+
+## low network effect terms
+agg_var_names <- colSums(X[neg_alpha_ind,])
+agg_ind <- which(agg_var_names>0)
+write.csv(colnames(X)[agg_ind], paste0(prefix, "low network effect terms.csv"), row.names = T)
+
+## low network effect and high coef terms 
+agg_inter_ind <- intersect(agg_ind,pos_coef_ind)
+write.csv(colnames(X)[agg_inter_ind], paste0(prefix, "low network effect and high coef terms.csv"), row.names = T)
+
+## high network effect and low coef terms 
+agg_inter_ind <- intersect(agg_ind,neg_coef_ind)
+write.csv(colnames(X)[agg_inter_ind], paste0(prefix, "low network effect and low coef terms.csv"), row.names = T)
+
+
+
 # logistic -> causal
 # criterion -> forecast
 # 
