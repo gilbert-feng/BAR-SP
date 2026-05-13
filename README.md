@@ -1,8 +1,7 @@
 
-Codes and data for procuding the simulation and empirical analysis in **Shrinkage estimation and inference for network-linked data: a robust spectral embedding approach**. The utilized data is processed based on the statistical citation network data collected by Gao et al. (2023).
-
+Codes and data for procuding the simulation and empirical analysis in **Shrinkage estimation and inference for network-linked data: a robust spectral embedding approach**. The utilized data is processed based on the dataset collected by Crespo Cuaresma & Feldkircher (2013).
 
 # Reference
-Gao, T., Zhang, Y., Pan, R., & Wang, H. (2023). Large-scale Multi-layer Academic Networks Derived from Statistical Publications. arXiv preprint arXiv:2308.11287.
+Crespo Cuaresma, J. & Feldkircher, M. (2013), ‘Spatial filtering, model uncertainty and the speed of income convergence in europe’, Journal of Applied Econometrics 28(4), 720–741
 
 

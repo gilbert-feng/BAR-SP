@@ -139,85 +139,101 @@ BAR.SP.Prod <- function(X,x_proj,Z_hat,Y,W_cup,K,r,homo,K_fold=2,lambda_seq,alph
   }
   
   # BAR estimate with optimal lambda
-  beta_hat <- BAR.iter(X,beta_z,lambda_opt,K_fold, regular = regular)
-  beta_hat[abs(beta_hat)<active_thr] <- 0
-  active_ind <- which(abs(beta_hat)>active_thr)
+  beta_hat <- BAR.iter(X, beta_z, lambda_opt, K_fold, regular = regular)
+  beta_hat[abs(beta_hat) < active_thr] <- 0
+  active_ind <- which(abs(beta_hat) > active_thr)
   beta_act <- beta_hat[active_ind]
   
   # IV Inference
   ## (1) homo
   if (homo == 1) {
-    sigma2_hat <- sum((Y-H%*%Y)^2)/(n-ncol(X)-K+r)
+    sigma2_hat <- sum((Y - H %*% Y)^2) / (n - ncol(X) - K + r)
     
-    # network inference
-    cov.gamma <- PU.hat%*%P_N
-    cov.gamma <- sigma2_hat*tcrossprod(cov.gamma)
-    gamma <- PU.hat%*%alpha_hat
-    if((K-r)>1){
-      eig.cov.gamma <- eigen(cov.gamma,symmetric=TRUE)
-      inv.sqrt.cov.gamma <- t(eig.cov.gamma$vectors)*sqrt(1/eig.cov.gamma$values)
-      adjusted.gamma <- inv.sqrt.cov.gamma%*%gamma
-    }else{
+    # network inference 
+    cov.gamma <- PU.hat %*% P_N
+    cov.gamma <- sigma2_hat * tcrossprod(cov.gamma)
+    gamma <- PU.hat %*% alpha_hat
+    if ((K - r) > 1) {
+      eig.cov.gamma <- eigen(cov.gamma, symmetric = TRUE)
+      inv.sqrt.cov.gamma <- t(eig.cov.gamma$vectors) * sqrt(1 / eig.cov.gamma$values)
+      adjusted.gamma <- inv.sqrt.cov.gamma %*% gamma
+    } else {
       adjusted.gamma <- 0
     }
     chisq.val <- sum(adjusted.gamma^2)
-    chisq.p <- pchisq(chisq.val,df=K-r,lower.tail=FALSE)
+    chisq.p <- pchisq(chisq.val, df = K - r, lower.tail = FALSE)
     
     # BAR inference with active components
-    tmp_cov <- t(X)%*%P_C
-    tmp_cov <- tcrossprod(tmp_cov)
-    X_active <- X[,active_ind]
-    XX_active <- crossprod(X_active)
-    cov_hat <- sigma2_hat*solve(XX_active, tmp_cov[active_ind, active_ind]) %*% solve(XX_active)
-    diag_sd <- sqrt(diag(cov_hat))
-    abs.t.val <- abs(beta_act/diag_sd)
-    t.pval <- 1-pnorm(abs.t.val)
-    CI.lower <- beta_act - qnorm(1-alpha.CI/2)*diag_sd
-    CI.upper <- beta_act + qnorm(1-alpha.CI/2)*diag_sd
-    coef.mat <- cbind(beta_act,CI.lower,CI.upper,t.pval)
-    colnames(coef.mat) <- c("active coef","CI-lower","CI-upper","p-val")
+    if (length(active_ind) > 0) {
+      tmp_cov <- t(X) %*% P_C
+      tmp_cov <- tcrossprod(tmp_cov)
+      X_active <- X[, active_ind]
+      XX_active <- crossprod(X_active)
+      cov_hat <- sigma2_hat * solve(XX_active, tmp_cov[active_ind, active_ind]) %*% solve(XX_active)
+      diag_sd <- sqrt(diag(cov_hat))
+      abs.t.val <- abs(beta_act / diag_sd)
+      t.pval <- 1 - pnorm(abs.t.val)
+      CI.lower <- beta_act - qnorm(1 - alpha.CI / 2) * diag_sd
+      CI.upper <- beta_act + qnorm(1 - alpha.CI / 2) * diag_sd
+      coef.mat <- cbind(beta_act, CI.lower, CI.upper, t.pval)
+      colnames(coef.mat) <- c("active coef", "CI-lower", "CI-upper", "p-val")
+      rownames(coef.mat) <- paste("V",active_ind,sep="")
+      
+    } else {
+      coef.mat <- matrix(NA, nrow = 0, ncol = 4)
+      cov_hat <- NA
+      colnames(coef.mat) <- c("active coef", "CI-lower", "CI-upper", "p-val")
+      warning("No active variables selected. coef.mat is empty.")
+    }
   } else {
-    sigma2_hat = NULL
-    D_e <- Y - alpha_hat - xi_hat - X%*%beta_hat
+    sigma2_hat <- NULL
+    D_e <- Y - alpha_hat - xi_hat - X %*% beta_hat
     
     # network inference
-    cov.gamma <- PU.hat%*%P_N%*%diag(as.vector(D_e))
+    cov.gamma <- PU.hat %*% P_N %*% diag(as.vector(D_e))
     cov.gamma <- tcrossprod(cov.gamma)
-    gamma <- PU.hat%*%alpha_hat
-    if((K-r)>1){
-      eig.cov.gamma <- eigen(cov.gamma,symmetric=TRUE)
-      inv.sqrt.cov.gamma <- t(eig.cov.gamma$vectors)*sqrt(1/eig.cov.gamma$values)
-      adjusted.gamma <- inv.sqrt.cov.gamma%*%gamma
-    }else{
+    gamma <- PU.hat %*% alpha_hat
+    if ((K - r) > 1) {
+      eig.cov.gamma <- eigen(cov.gamma, symmetric = TRUE)
+      inv.sqrt.cov.gamma <- t(eig.cov.gamma$vectors) * sqrt(1 / eig.cov.gamma$values)
+      adjusted.gamma <- inv.sqrt.cov.gamma %*% gamma
+    } else {
       adjusted.gamma <- 0
     }
     chisq.val <- sum(adjusted.gamma^2)
-    chisq.p <- pchisq(chisq.val,df=K-r,lower.tail=FALSE)
+    chisq.p <- pchisq(chisq.val, df = K - r, lower.tail = FALSE)
     
     # BAR inference with active components
-    tmp_cov <- t(X)%*%P_C%*%diag(as.vector(D_e))
-    tmp_cov <- tcrossprod(tmp_cov)
-    X_active <- X[,active_ind]
-    XX_active <- crossprod(X_active)
-    cov_hat <- solve(XX_active, tmp_cov[active_ind, active_ind]) %*% solve(XX_active)
-    diag_sd <- sqrt(diag(cov_hat))
-    abs.t.val <- abs(beta_act/diag_sd)
-    t.pval <- 1-pnorm(abs.t.val)
-    CI.lower <- beta_act - qnorm(1-alpha.CI/2)*diag_sd
-    CI.upper <- beta_act + qnorm(1-alpha.CI/2)*diag_sd
-    coef.mat <- cbind(beta_act,CI.lower,CI.upper,t.pval)
-    colnames(coef.mat) <- c("active coef","CI-lower","CI-upper","p-val")
-    
+    if (length(active_ind) > 0) {
+      tmp_cov <- t(X) %*% P_C %*% diag(as.vector(D_e))
+      tmp_cov <- tcrossprod(tmp_cov)
+      X_active <- X[, active_ind]
+      XX_active <- crossprod(X_active)
+      cov_hat <- solve(XX_active, tmp_cov[active_ind, active_ind]) %*% solve(XX_active)
+      diag_sd <- sqrt(diag(cov_hat))
+      abs.t.val <- abs(beta_act / diag_sd)
+      t.pval <- 1 - pnorm(abs.t.val)
+      CI.lower <- beta_act - qnorm(1 - alpha.CI / 2) * diag_sd
+      CI.upper <- beta_act + qnorm(1 - alpha.CI / 2) * diag_sd
+      coef.mat <- cbind(beta_act, CI.lower, CI.upper, t.pval)
+      colnames(coef.mat) <- c("active coef", "CI-lower", "CI-upper", "p-val")
+      rownames(coef.mat) <- paste("V",active_ind,sep="")
+      
+    } else {
+      coef.mat <- matrix(NA, nrow = 0, ncol = 4)
+      cov_hat <- NA
+      colnames(coef.mat) <- c("active coef", "CI-lower", "CI-upper", "p-val")
+      warning("No active variables selected. coef.mat is empty.")
+    }
   }
   
-  rownames(coef.mat) <- paste("V",active_ind,sep="")
+  fit.residual <- Y-X%*%beta_hat-xi_hat-alpha_hat
+  in_mse <- mean(fit.residual^2)
   
-  in_mse <- mean((Y-X%*%beta_hat-xi_hat-alpha_hat)^2)
-  
-  return(list(beta=beta_hat,active_ind=active_ind,alpha=alpha_hat,theta=theta_hat,r=r,
+  return(list(beta=beta_hat,active_ind=active_ind,alpha=alpha_hat,xi_hat=xi_hat,theta=theta_hat,r=r,
               sigma2=sigma2_hat,act_cov_hat=cov_hat,act.coef.mat=coef.mat,
               fitted=fitted.Y,chisq.val=chisq.val,chisq.p=chisq.p,lambda_opt=lambda_opt,
-              project_measures=project_measures,out_mse=min_mse,in_mse=in_mse))
+              project_measures=project_measures,out_mse=min_mse,in_mse=in_mse,fit.residual=fit.residual))
   
 }
 
