@@ -153,7 +153,7 @@ BAR.SP.Prod <- function(X,x_proj,Z_hat,Y,W_cup,K,r,homo,K_fold=2,lambda_seq,alph
     cov.gamma <- PU.hat %*% P_N
     cov.gamma <- sigma2_hat * tcrossprod(cov.gamma)
     gamma <- PU.hat %*% alpha_hat
-    if ((K - r) > 1) {
+    if ((K - r) >= 1) {
       eig.cov.gamma <- eigen(cov.gamma, symmetric = TRUE)
       inv.sqrt.cov.gamma <- t(eig.cov.gamma$vectors) * sqrt(1 / eig.cov.gamma$values)
       adjusted.gamma <- inv.sqrt.cov.gamma %*% gamma
@@ -193,7 +193,7 @@ BAR.SP.Prod <- function(X,x_proj,Z_hat,Y,W_cup,K,r,homo,K_fold=2,lambda_seq,alph
     cov.gamma <- PU.hat %*% P_N %*% diag(as.vector(D_e))
     cov.gamma <- tcrossprod(cov.gamma)
     gamma <- PU.hat %*% alpha_hat
-    if ((K - r) > 1) {
+    if ((K - r) >= 1) {
       eig.cov.gamma <- eigen(cov.gamma, symmetric = TRUE)
       inv.sqrt.cov.gamma <- t(eig.cov.gamma$vectors) * sqrt(1 / eig.cov.gamma$values)
       adjusted.gamma <- inv.sqrt.cov.gamma %*% gamma
